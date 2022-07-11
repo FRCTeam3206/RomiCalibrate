@@ -9,6 +9,9 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import frc.robot.sensors.RomiGyro;
+import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -38,7 +41,7 @@ public class Drivetrain extends SubsystemBase {
   private final BuiltInAccelerometer m_accelerometer = new BuiltInAccelerometer();
 
   // Odometry
-  // public final DifferentialDriveOdometry m_odometry = new DifferentialDriveOdometry(m_gyro., new Pose2d(0, 0, new Rotation2d()));;
+  public final DifferentialDriveOdometry m_odometry = new DifferentialDriveOdometry(m_gyro.getRotation2d(), new Pose2d(0, 0, new Rotation2d()));;
 
   /** Creates a new Drivetrain. */
   public Drivetrain() {
