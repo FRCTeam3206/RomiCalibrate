@@ -1,19 +1,28 @@
+/*
+This file comes from the Sciborgs Team 4061 and can be found in their repo 
+at https://bitbucket.org/sciborgs4061/java-robot-2022-beta-public/src/main/
+
+This was suggested as a way to capture calibration information for the Romi
+using SysId, which doesn't have proper support for Romi yet.
+*/
+
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Drivetrain;
-import frc.robot.SysIdDrivetrainLogger;
+import frc.robot.sysid.SysIdDrivetrainLogger;
 
 public class Characterize extends CommandBase {
     private final Drivetrain m_drivetrain;
-    private SysIdDrivetrainLogger m_logger;   
+    private SysIdDrivetrainLogger m_logger;
     private Double m_prevAngle = 0.0;
     private Double m_prevTime = 0.0;
+
     public Characterize(Drivetrain drivetrain) {
 
         m_drivetrain = drivetrain;
-        addRequirements(m_drivetrain);   
+        addRequirements(m_drivetrain);
     }
 
     // Called when the command is initially scheduled.
@@ -22,14 +31,14 @@ public class Characterize extends CommandBase {
         // reset gyro and encoders
         // set timeperiod to .005
         m_drivetrain.m_diffDrive.setDeadband(0.0);
-        // The following is called for the side-effect of resetting the 
+        // The following is called for the side-effect of resetting the
         // drivebase odometers.
-        // m_drivetrain.resetOdometry(m_drivetrain.m_odometry.getPoseMeters()); 
+        m_drivetrain.resetOdometry(m_drivetrain.m_odometry.getPoseMeters());
         m_logger = new SysIdDrivetrainLogger();
         m_logger.updateThreadPriority();
         m_logger.initLogging();
     }
-   
+
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
@@ -41,14 +50,14 @@ public class Characterize extends CommandBase {
         double deltaAngle = angularPosition - m_prevAngle;
         double now = Timer.getFPGATimestamp();
         double deltaTime = now - m_prevTime;
-        double angularRate = m_prevTime==0 || deltaTime==0 ? 0.0 : deltaAngle/deltaTime;
+        double angularRate = m_prevTime == 0 || deltaTime == 0 ? 0.0 : deltaAngle / deltaTime;
         m_prevAngle = angularPosition;
         m_prevTime = now;
 
-        m_logger.log(leftPosition, rightPosition, leftRate, 
-                   rightRate, angularPosition, angularRate);
-        m_drivetrain.tankDriveVolts(m_logger.getLeftMotorVoltage(), 
-                               m_logger.getRightMotorVoltage());
+        m_logger.log(leftPosition, rightPosition, leftRate,
+                rightRate, angularPosition, angularRate);
+        m_drivetrain.tankDriveVolts(m_logger.getLeftMotorVoltage(),
+                m_logger.getRightMotorVoltage());
     }
 
     // Called once the command ends or is interrupted.
@@ -71,4 +80,3 @@ public class Characterize extends CommandBase {
 
     }
 }
-
