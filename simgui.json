@@ -13,11 +13,24 @@
       "/FMSInfo": "FMSInfo",
       "/LiveWindow/Drivetrain": "Subsystem",
       "/LiveWindow/Ungrouped/DifferentialDrive[1]": "DifferentialDrive",
-      "/LiveWindow/Ungrouped/Scheduler": "Scheduler"
+      "/LiveWindow/Ungrouped/Scheduler": "Scheduler",
+      "/SmartDashboard/Field": "Field2d"
     }
   },
   "NetworkTables": {
+    "Romi": {
+      "Information": {
+        "open": true
+      },
+      "Status": {
+        "open": true
+      },
+      "open": true
+    },
     "SmartDashboard": {
+      "Field": {
+        "open": true
+      },
       "Traj Drive Volts": {
         "open": true
       },
