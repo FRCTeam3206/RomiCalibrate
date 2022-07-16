@@ -1,3 +1,11 @@
+/*
+This file comes from the Sciborgs Team 4061 and can be found in their repo 
+at https://bitbucket.org/sciborgs4061/java-robot-2022-beta-public/src/main/
+
+This was suggested as a way to capture calibration information for the Romi
+using SysId, which doesn't have proper support for Romi yet.
+*/
+
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.Timer;
@@ -24,7 +32,7 @@ public class Characterize extends CommandBase {
         m_drivetrain.m_diffDrive.setDeadband(0.0);
         // The following is called for the side-effect of resetting the 
         // drivebase odometers.
-        // m_drivetrain.resetOdometry(m_drivetrain.m_odometry.getPoseMeters()); 
+        m_drivetrain.resetOdometry(m_drivetrain.m_odometry.getPoseMeters()); 
         m_logger = new SysIdDrivetrainLogger();
         m_logger.updateThreadPriority();
         m_logger.initLogging();

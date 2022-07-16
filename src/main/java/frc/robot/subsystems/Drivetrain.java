@@ -14,8 +14,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
 
 public class Drivetrain extends SubsystemBase {
   private static final double kCountsPerRevolution = 1440.0;
@@ -41,7 +41,9 @@ public class Drivetrain extends SubsystemBase {
   private final BuiltInAccelerometer m_accelerometer = new BuiltInAccelerometer();
 
   // Odometry
-  public final DifferentialDriveOdometry m_odometry = new DifferentialDriveOdometry(m_gyro.getRotation2d(), new Pose2d(0, 0, new Rotation2d()));;
+  public final DifferentialDriveOdometry m_odometry = new DifferentialDriveOdometry(m_gyro.getRotation2d(),
+      new Pose2d(0, 0, new Rotation2d()));;
+  private final Field2d m_field = new Field2d();
 
   /** Creates a new Drivetrain. */
   public Drivetrain() {
@@ -55,6 +57,8 @@ public class Drivetrain extends SubsystemBase {
     m_rightEncoder.setDistancePerPulse((Math.PI * kWheelDiameterMeter) / kCountsPerRevolution);
     resetEncoders();
     resetGyro();
+
+    SmartDashboard.putData("Field", m_field);
   }
 
   public void arcadeDrive(double xaxisSpeed, double zaxisRotate) {
@@ -162,7 +166,7 @@ public class Drivetrain extends SubsystemBase {
 
   public void tankDriveVolts(double leftVolts, double rightVolts) {
     double voltage = RobotController.getBatteryVoltage();
-    m_diffDrive.tankDrive(Math.min(leftVolts/voltage, 1.0), Math.min(rightVolts/voltage, 1.0), false);
+    m_diffDrive.tankDrive(Math.min(leftVolts / voltage, 1.0), Math.min(rightVolts / voltage, 1.0), false);
     SmartDashboard.putNumber(leftVoltsKey, leftVolts);
     SmartDashboard.putNumber(rightVoltsKey, rightVolts);
   }
@@ -170,5 +174,12 @@ public class Drivetrain extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    m_odometry.update(m_gyro.getRotation2d(), getLeftDistanceMeters(), getRightDistanceMeters());
+    m_field.setRobotPose(m_odometry.getPoseMeters());
+  }
+
+  public void resetOdometry(Pose2d pose) {
+    resetEncoders();
+    m_odometry.resetPosition(pose, m_gyro.getRotation2d());
   }
 }
