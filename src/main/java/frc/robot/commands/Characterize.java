@@ -15,13 +15,14 @@ import frc.robot.sysid.SysIdDrivetrainLogger;
 
 public class Characterize extends CommandBase {
     private final Drivetrain m_drivetrain;
-    private SysIdDrivetrainLogger m_logger;   
+    private SysIdDrivetrainLogger m_logger;
     private Double m_prevAngle = 0.0;
     private Double m_prevTime = 0.0;
+
     public Characterize(Drivetrain drivetrain) {
 
         m_drivetrain = drivetrain;
-        addRequirements(m_drivetrain);   
+        addRequirements(m_drivetrain);
     }
 
     // Called when the command is initially scheduled.
@@ -30,14 +31,14 @@ public class Characterize extends CommandBase {
         // reset gyro and encoders
         // set timeperiod to .005
         m_drivetrain.m_diffDrive.setDeadband(0.0);
-        // The following is called for the side-effect of resetting the 
+        // The following is called for the side-effect of resetting the
         // drivebase odometers.
-        m_drivetrain.resetOdometry(m_drivetrain.m_odometry.getPoseMeters()); 
+        m_drivetrain.resetOdometry(m_drivetrain.m_odometry.getPoseMeters());
         m_logger = new SysIdDrivetrainLogger();
         m_logger.updateThreadPriority();
         m_logger.initLogging();
     }
-   
+
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
@@ -49,14 +50,14 @@ public class Characterize extends CommandBase {
         double deltaAngle = angularPosition - m_prevAngle;
         double now = Timer.getFPGATimestamp();
         double deltaTime = now - m_prevTime;
-        double angularRate = m_prevTime==0 || deltaTime==0 ? 0.0 : deltaAngle/deltaTime;
+        double angularRate = m_prevTime == 0 || deltaTime == 0 ? 0.0 : deltaAngle / deltaTime;
         m_prevAngle = angularPosition;
         m_prevTime = now;
 
-        m_logger.log(leftPosition, rightPosition, leftRate, 
-                   rightRate, angularPosition, angularRate);
-        m_drivetrain.tankDriveVolts(m_logger.getLeftMotorVoltage(), 
-                               m_logger.getRightMotorVoltage());
+        m_logger.log(leftPosition, rightPosition, leftRate,
+                rightRate, angularPosition, angularRate);
+        m_drivetrain.tankDriveVolts(m_logger.getLeftMotorVoltage(),
+                m_logger.getRightMotorVoltage());
     }
 
     // Called once the command ends or is interrupted.
@@ -79,4 +80,3 @@ public class Characterize extends CommandBase {
 
     }
 }
-
