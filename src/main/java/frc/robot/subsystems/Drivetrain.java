@@ -165,8 +165,11 @@ public class Drivetrain extends SubsystemBase {
   private static final String rightVoltsKey = "Traj Drive Volts/Right";
 
   public void tankDriveVolts(double leftVolts, double rightVolts) {
-    double voltage = RobotController.getBatteryVoltage();
-    m_diffDrive.tankDrive(Math.min(leftVolts / voltage, 1.0), Math.min(rightVolts / voltage, 1.0), false);
+    // double voltage = RobotController.getBatteryVoltage();
+    // m_diffDrive.tankDrive(Math.min(leftVolts / voltage, 1.0), Math.min(rightVolts / voltage, 1.0), false);
+    m_leftMotor.setVoltage(leftVolts);
+    m_rightMotor.setVoltage(rightVolts);
+    m_diffDrive.feed();
     SmartDashboard.putNumber(leftVoltsKey, leftVolts);
     SmartDashboard.putNumber(rightVoltsKey, rightVolts);
   }
