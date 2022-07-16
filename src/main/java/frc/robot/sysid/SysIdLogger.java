@@ -1,4 +1,4 @@
-package frc.robot;
+package frc.robot.sysid;
 
 import java.util.ArrayList;
 
