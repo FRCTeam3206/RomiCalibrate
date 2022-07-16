@@ -18,6 +18,9 @@
     }
   },
   "NetworkTables": {
+    "LiveWindow": {
+      "open": true
+    },
     "Romi": {
       "Information": {
         "open": true
@@ -28,9 +31,6 @@
       "open": true
     },
     "SmartDashboard": {
-      "Field": {
-        "open": true
-      },
       "Traj Drive Volts": {
         "open": true
       },
