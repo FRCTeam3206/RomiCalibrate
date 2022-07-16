@@ -49,6 +49,7 @@ public class Characterize extends CommandBase {
                    rightRate, angularPosition, angularRate);
         m_drivetrain.tankDriveVolts(m_logger.getLeftMotorVoltage(), 
                                m_logger.getRightMotorVoltage());
+        m_logger.updateData();
     }
 
     // Called once the command ends or is interrupted.

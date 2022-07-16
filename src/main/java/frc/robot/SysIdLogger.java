@@ -35,9 +35,9 @@ public class SysIdLogger {
           SmartDashboard.putBoolean("SysIdWrongMech", true);
         }
       
-        m_testType = SmartDashboard.getString("SysIdTestType", "");
+        m_testType = SmartDashboard.getString("SysIdTestType", "Quasistatic");
         m_rotate = SmartDashboard.getBoolean("SysIdRotate", false);
-        m_voltageCommand = SmartDashboard.getNumber("SysIdVoltageCommand", 0.0);
+        m_voltageCommand = SmartDashboard.getNumber("SysIdVoltageCommand", .25);
         m_startTime = Timer.getFPGATimestamp();
         m_data.clear();
       }
@@ -75,6 +75,7 @@ public class SysIdLogger {
         if (!isWrongMechanism()) {
           if (m_testType.equals("Quasistatic")) {
             m_motorVoltage = m_voltageCommand * (m_timestamp - m_startTime);
+            SmartDashboard.putNumber("RawMotorVoltage", m_motorVoltage);
           } else if (m_testType.equals("Dynamic")) {
             m_motorVoltage = m_voltageCommand;
           } else {
