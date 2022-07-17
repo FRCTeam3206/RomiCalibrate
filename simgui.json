@@ -1,6 +1,11 @@
 {
   "HALProvider": {
     "Other Devices": {
+      "BuiltInAccel": {
+        "header": {
+          "open": true
+        }
+      },
       "RomiGyro": {
         "header": {
           "open": true
@@ -18,22 +23,13 @@
     }
   },
   "NetworkTables": {
-    "LiveWindow": {
-      "open": true
-    },
     "Romi": {
-      "Information": {
-        "open": true
-      },
       "Status": {
         "open": true
       },
       "open": true
     },
     "SmartDashboard": {
-      "Traj Drive Volts": {
-        "open": true
-      },
       "open": true
     }
   }

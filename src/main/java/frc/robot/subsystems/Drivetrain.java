@@ -177,6 +177,7 @@ public class Drivetrain extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    SmartDashboard.putNumber("Battery Voltage", RobotController.getBatteryVoltage());
     m_odometry.update(m_gyro.getRotation2d(), getLeftDistanceMeters(), getRightDistanceMeters());
     m_field.setRobotPose(m_odometry.getPoseMeters());
   }
