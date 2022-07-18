@@ -4,15 +4,31 @@
 
 package frc.robot;
 
+import java.util.List;
+
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.RamseteController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.math.trajectory.constraint.DifferentialDriveVoltageConstraint;
 // import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
-
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.ArcadeDrive;
 import frc.robot.commands.Characterize;
 import frc.robot.subsystems.Drivetrain;
+import frc.robot.Constants.DriveConstants;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.RamseteCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -27,7 +43,9 @@ public class RobotContainer {
   // Assumes a gamepad plugged into channnel 0
   private final Joystick m_controller = new Joystick(0);
 
-  private final Characterize m_autoCommand = new Characterize(m_drivetrain);
+  private final SendableChooser<Command> m_chooser = new SendableChooser<>();
+
+  // private final Characterize m_autoCommand = new Characterize(m_drivetrain);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -45,6 +63,11 @@ public class RobotContainer {
     // Default command is arcade drive. This will run unless another command
     // is scheduled over it.
     m_drivetrain.setDefaultCommand(getArcadeDriveCommand());
+
+    m_chooser.setDefaultOption("Characterize", new Characterize(m_drivetrain));
+    m_chooser.addOption("Ramsete Trajectory", generateRamseteCommand());
+
+    SmartDashboard.putData(m_chooser);
   }
 
   /**
@@ -54,7 +77,7 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
-    return m_autoCommand;
+    return m_chooser.getSelected();
   }
 
   /**
@@ -66,4 +89,71 @@ public class RobotContainer {
     return new ArcadeDrive(
         m_drivetrain, () -> -m_controller.getRawAxis(1), () -> m_controller.getRawAxis(0));
   }
+
+  
+  /**
+   * Generate a trajectory following Ramsete command
+   * 
+   * This is very similar to the WPILib RamseteCommand example. It uses
+   * constants defined in the Constants.java file. These constants were 
+   * found empirically by using the frc-characterization tool.
+   * @param <Trajectory>
+   * 
+   * @return A SequentialCommand that sets up and executes a trajectory following Ramsete command
+   */
+  private Command generateRamseteCommand() {
+    var autoVoltageConstraint =
+        new DifferentialDriveVoltageConstraint(
+            new SimpleMotorFeedforward(DriveConstants.ksVolts, 
+                                       DriveConstants.kvVoltSecondsPerMeter, 
+                                       DriveConstants.kaVoltSecondsSquaredPerMeter),
+            DriveConstants.kDriveKinematics,
+            10);
+
+    TrajectoryConfig config =
+        new TrajectoryConfig(DriveConstants.kMaxSpeedMetersPerSecond, 
+                             DriveConstants.kMaxAccelerationMetersPerSecondSquared)
+            .setKinematics(DriveConstants.kDriveKinematics)
+            .addConstraint(autoVoltageConstraint);
+
+            
+    // This trajectory can be modified to suit your purposes
+    // Note that all coordinates are in meters, and follow NWU conventions.
+    // If you would like to specify coordinates in inches (which might be easier
+    // to deal with for the Romi), you can use the Units.inchesToMeters() method
+    Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
+        // Start at the origin facing the +X direction
+        new Pose2d(0, 0, new Rotation2d(0)),
+        List.of(
+            new Translation2d(0.5, 0.25),
+            new Translation2d(1.0, -0.25),
+            new Translation2d(1.5, 0)
+        ),
+        new Pose2d(0.0, 0, new Rotation2d(Math.PI)),
+        config);
+
+    RamseteCommand ramseteCommand = new RamseteCommand(
+        exampleTrajectory,
+        m_drivetrain::getPose,
+        new RamseteController(DriveConstants.kRamseteB, DriveConstants.kRamseteZeta),
+        new SimpleMotorFeedforward(DriveConstants.ksVolts, DriveConstants.kvVoltSecondsPerMeter, DriveConstants.kaVoltSecondsSquaredPerMeter),
+        DriveConstants.kDriveKinematics,
+        m_drivetrain::getWheelSpeeds,
+        new PIDController(DriveConstants.kPDriveVel, 0, 0),
+        new PIDController(DriveConstants.kPDriveVel, 0, 0),
+        m_drivetrain::tankDriveVolts,
+        m_drivetrain);
+
+    m_drivetrain.resetOdometry(exampleTrajectory.getInitialPose());
+
+    // Set up a sequence of commands
+    // First, we want to reset the drivetrain odometry
+    return new InstantCommand(() -> m_drivetrain.resetOdometry(exampleTrajectory.getInitialPose()), m_drivetrain)
+        // next, we run the actual ramsete command
+        .andThen(ramseteCommand)
+
+        // Finally, we make sure that the robot stops
+        .andThen(new InstantCommand(() -> m_drivetrain.tankDriveVolts(0, 0), m_drivetrain));
+  } 
+
 }

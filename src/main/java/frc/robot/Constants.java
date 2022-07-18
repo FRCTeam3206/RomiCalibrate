@@ -21,7 +21,7 @@ public final class Constants {
         public static final double kvVoltSecondsPerMeter = 10.363;
         public static final double kaVoltSecondsSquaredPerMeter = 0.92327;
 
-        public static final double kPDriveVal = 6.9641;
+        public static final double kPDriveVel = 6.9641;
 
         // Track width for kinematics
         public static final double kTrackWidthMeters = 0.141;  // known value from Romi documentation
