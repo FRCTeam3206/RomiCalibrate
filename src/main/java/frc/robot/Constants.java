@@ -29,8 +29,8 @@ public final class Constants {
             new DifferentialDriveKinematics(kTrackWidthMeters);
         
         // Max speed (should be less than top speed) and acceleration (not as critical)
-        public static final double kMaxSpeedMetersPerSecond = 0.6;
-        public static final double kMaxAccelerationMetersPerSecondSquared = 0.6;
+        public static final double kMaxSpeedMetersPerSecond = 0.4;
+        public static final double kMaxAccelerationMetersPerSecondSquared = 0.3;
         
         // Ramsete parameters
         public static final double kRamseteB = 2;
