@@ -126,10 +126,7 @@ public class RobotContainer {
     // to deal with for the Romi), you can use the Units.inchesToMeters() method
     NetworkTableInstance nti=NetworkTableInstance.getDefault();
     Double[] commandsD=(Double[])nti.getTable("BallLocator").getEntry("Commands").getNumberArray(new Number[]{0});
-    if(commandsD.length==0){
-      commandsD=new Double[]{1.};
-    }
-    ArrayList<Translation2d> drive=getDrive(commandsD[0].intValue());
+    ArrayList<Translation2d> drive=getDrive(nti.getTable("BallLocator").getEntry("Command").getNumber(0).intValue());
     System.out.println(drive.size());
     Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
         // Start at the origin facing the +X direction
