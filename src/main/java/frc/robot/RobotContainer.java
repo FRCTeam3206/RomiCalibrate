@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -16,6 +17,7 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.constraint.DifferentialDriveVoltageConstraint;
+import edu.wpi.first.networktables.NetworkTableInstance;
 // import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
@@ -77,7 +79,8 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
-    return m_chooser.getSelected();
+    //return m_chooser.getSelected();
+    return generateRamseteCommand();
   }
 
   /**
@@ -121,15 +124,18 @@ public class RobotContainer {
     // Note that all coordinates are in meters, and follow NWU conventions.
     // If you would like to specify coordinates in inches (which might be easier
     // to deal with for the Romi), you can use the Units.inchesToMeters() method
+    NetworkTableInstance nti=NetworkTableInstance.getDefault();
+    Double[] commandsD=(Double[])nti.getTable("BallLocator").getEntry("Commands").getNumberArray(new Number[]{0});
+    if(commandsD.length==0){
+      commandsD=new Double[]{1.};
+    }
+    ArrayList<Translation2d> drive=getDrive(commandsD[0].intValue());
+    System.out.println(drive.size());
     Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
         // Start at the origin facing the +X direction
         new Pose2d(0, 0, new Rotation2d(0)),
-        List.of(
-            new Translation2d(0.5, 0.25),
-            new Translation2d(1.0, -0.25),
-            new Translation2d(1.5, 0)
-        ),
-        new Pose2d(0.0, 0, new Rotation2d(Math.PI)),
+        drive,
+        new Pose2d(2.5,0, new Rotation2d(Math.PI)),
         config);
 
     RamseteCommand ramseteCommand = new RamseteCommand(
@@ -155,5 +161,28 @@ public class RobotContainer {
         // Finally, we make sure that the robot stops
         .andThen(new InstantCommand(() -> m_drivetrain.tankDriveVolts(0, 0), m_drivetrain));
   } 
-
+  public ArrayList<Translation2d> getDrive(Integer input){
+    ArrayList<Translation2d> drive = new ArrayList<>();
+    switch(input){
+      case 0:
+        drive.add(new Translation2d(2, 0));
+        break;
+      case 1:
+        drive.add(new Translation2d(1, 0));
+        drive.add(new Translation2d(1,1));
+        drive.add(new Translation2d(2,1));
+        break;
+      case 2:
+        drive.add(new Translation2d(1,0));
+        drive.add(new Translation2d(1,-1));
+        drive.add(new Translation2d(2,-1));
+        break;
+      case 3:
+        drive.add(new Translation2d(2, 0));
+        drive.add(new Translation2d(1,0));
+        drive.add(new Translation2d(2,0));
+        break;
+    }
+    return drive;
+  }
 }
