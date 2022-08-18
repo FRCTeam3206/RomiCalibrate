@@ -161,23 +161,23 @@ public class RobotContainer {
   public ArrayList<Translation2d> getDrive(Integer input){
     ArrayList<Translation2d> drive = new ArrayList<>();
     switch(input){
-      case 0:
-        drive.add(new Translation2d(2, 0));
+      case 0://green
+        //drive.add(new Translation2d(2, 0));
         break;
-      case 1:
+      case 1://blue
         drive.add(new Translation2d(1, 0));
         drive.add(new Translation2d(1,1));
         drive.add(new Translation2d(2,1));
         break;
-      case 2:
+      case 2://yellow
         drive.add(new Translation2d(1,0));
         drive.add(new Translation2d(1,-1));
         drive.add(new Translation2d(2,-1));
         break;
-      case 3:
-        drive.add(new Translation2d(2, 0));
-        drive.add(new Translation2d(1,0));
-        drive.add(new Translation2d(2,0));
+      case 3://red
+        drive.add(new Translation2d(1,.5));
+        drive.add(new Translation2d(1.5,-.5));
+        drive.add(new Translation2d(2,.5));
         break;
     }
     return drive;
